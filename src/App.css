@@ -1,0 +1,212 @@
+.app-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+header h1 {
+  margin: 0;
+}
+
+.disclaimer-banner {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fff2d8;
+  border: 1px solid #f0d28e;
+  color: #5c4300;
+}
+
+nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 16px;
+}
+
+button {
+  border: 1px solid #cfd3da;
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #f5f7fa;
+}
+
+button.active {
+  background: #3f51b5;
+  color: #fff;
+  border-color: #3f51b5;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 16px;
+}
+
+aside,
+.editor-panel,
+.guide-page {
+  border: 1px solid #e1e4ea;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff;
+}
+
+.aside-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.case-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.case-list li button {
+  width: 100%;
+  text-align: left;
+  display: grid;
+  gap: 3px;
+}
+
+.case-list .empty {
+  padding: 8px;
+  color: #5f6978;
+}
+
+.export-group {
+  display: grid;
+  gap: 8px;
+}
+
+form {
+  display: grid;
+  gap: 10px;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+label,
+fieldset {
+  display: grid;
+  gap: 6px;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cfd3da;
+  border-radius: 8px;
+  padding: 8px;
+  font: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+small {
+  color: #a40000;
+}
+
+fieldset {
+  border: 1px solid #d9dce2;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.checkbox-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.actions,
+.report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+button.danger {
+  border-color: #d83a3a;
+  color: #a10000;
+}
+
+.report-panel {
+  margin-top: 16px;
+  border-top: 1px solid #e1e4ea;
+  padding-top: 12px;
+}
+
+.report-previews {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+pre {
+  margin: 0;
+  white-space: pre-wrap;
+  background: #f6f8fb;
+  border: 1px solid #e1e4ea;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 0.9rem;
+}
+
+.copy-feedback {
+  margin: 8px 0;
+  color: #226b2a;
+}
+
+.guide-page h2 {
+  margin-top: 0;
+}
+
+.guide-note {
+  margin-top: 12px;
+  padding: 8px;
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+
+@media (max-width: 900px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .field-grid,
+  .checkbox-grid,
+  .report-previews {
+    grid-template-columns: 1fr;
+  }
+}
