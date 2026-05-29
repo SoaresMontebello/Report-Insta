@@ -258,19 +258,18 @@ function App() {
             : record,
         ),
       )
-      return
-    }
+    } else {
+      const now = new Date().toISOString()
+      const newRecord: CaseRecord = {
+        id: crypto.randomUUID(),
+        ...normalizedDraft,
+        createdAt: now,
+        updatedAt: now,
+      }
 
-    const now = new Date().toISOString()
-    const newRecord: CaseRecord = {
-      id: crypto.randomUUID(),
-      ...normalizedDraft,
-      createdAt: now,
-      updatedAt: now,
+      setCases((prevCases) => [newRecord, ...prevCases])
+      setSelectedId(newRecord.id)
     }
-
-    setCases((prevCases) => [newRecord, ...prevCases])
-    setSelectedId(newRecord.id)
   }
 
   const deleteCase = () => {
