@@ -26,7 +26,7 @@ export default function CasoDetailPage() {
     void getCasoById(id).then((data) => setCaso(data ?? null));
   }, [getCasoById, id]);
 
-  if (!id || Number.isNaN(id)) {
+  if (Number.isNaN(id) || id < 1) {
     return <AppShell><p>ID inválido.</p></AppShell>;
   }
 

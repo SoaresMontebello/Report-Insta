@@ -34,6 +34,13 @@ interface CasoFormProps {
   submitLabel?: string;
 }
 
+const toInputDate = (value?: string) => {
+  if (!value) return "";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "";
+  return parsed.toISOString().slice(0, 10);
+};
+
 const toDataUrl = (file: File) =>
   new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
@@ -56,7 +63,7 @@ export function CasoForm({ initialData, onSubmit, submitLabel = "Salvar" }: Caso
       shortDescription: initialData?.shortDescription ?? "",
       status: (initialData?.status ?? "pendente") as StatusCaso,
       internalNotes: initialData?.internalNotes ?? "",
-      sentAt: initialData?.sentAt ? initialData.sentAt.split("T")[0] : "",
+      sentAt: toInputDate(initialData?.sentAt),
       sentObservations: initialData?.sentObservations ?? "",
     }),
     [initialData],
