@@ -22,7 +22,7 @@ SafeReport v2 é uma aplicação **ética** para organizar evidências e gerar t
 - Upload de anexos (PNG/JPEG/WEBP, até 5MB)
 - Metadados dos anexos salvos no model `Anexo`
 - URLs assinadas para visualização/download de anexos
-- Rate limiting básico no login por email (janela de 15min)
+- Rate limiting básico no login por email/IP (janela de 15min)
 - Templates por tipo de violação + copiar para clipboard
 - Dashboard com estatísticas mínimas (total, por status, por tipo)
 

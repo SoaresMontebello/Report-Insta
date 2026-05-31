@@ -13,6 +13,47 @@ import {
 import { logWarn } from "@/app/lib/logger";
 import { prisma } from "@/app/lib/prisma";
 
+function readHeaderValue(
+  request: { headers?: Headers | Record<string, string | string[] | undefined> } | undefined,
+  name: string,
+) {
+  const headers = request?.headers;
+
+  if (!headers) {
+    return undefined;
+  }
+
+  if (headers instanceof Headers) {
+    return headers.get(name) ?? undefined;
+  }
+
+  const value = headers[name];
+
+  if (Array.isArray(value)) {
+    return value[0];
+  }
+
+  return value;
+}
+
+function getClientIp(
+  request: { headers?: Headers | Record<string, string | string[] | undefined> } | undefined,
+) {
+  const realIp = readHeaderValue(request, "x-real-ip");
+
+  if (realIp) {
+    return realIp.trim();
+  }
+
+  const forwardedFor = readHeaderValue(request, "x-forwarded-for");
+
+  if (!forwardedFor) {
+    return undefined;
+  }
+
+  return forwardedFor.split(",")[0]?.trim();
+}
+
 export const authOptions: NextAuthOptions = {
   secret: getEnv("NEXTAUTH_SECRET"),
   session: {
@@ -28,13 +69,13 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, request) {
         if (!credentials?.email || !credentials.password) {
           return null;
         }
 
         const normalizedEmail = credentials.email.toLowerCase().trim();
-        const rateLimitKey = createLoginRateLimitKey(normalizedEmail);
+        const rateLimitKey = createLoginRateLimitKey(normalizedEmail, getClientIp(request));
 
         if (isLoginRateLimited(rateLimitKey)) {
           logWarn("login_rate_limited", { email: normalizedEmail });
