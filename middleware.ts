@@ -6,10 +6,10 @@ import { logError } from "@/app/lib/logger";
 
 function handleMissingAuthSecret(req: NextRequest) {
   if (req.nextUrl.pathname.startsWith("/api/")) {
-    return NextResponse.json({ error: "Configuração de autenticação ausente." }, { status: 503 });
+    return NextResponse.json({ error: "Serviço indisponível." }, { status: 503 });
   }
 
-  return NextResponse.redirect(new URL("/login", req.url));
+  return new NextResponse("Serviço indisponível.", { status: 503 });
 }
 
 export async function middleware(req: NextRequest) {
