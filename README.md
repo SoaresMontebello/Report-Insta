@@ -22,6 +22,7 @@ SafeReport v2 é uma aplicação **ética** para organizar evidências e gerar t
 - Upload de anexos (PNG/JPEG/WEBP, até 5MB)
 - Metadados dos anexos salvos no model `Anexo`
 - URLs assinadas para visualização/download de anexos
+- Rate limiting básico no login por email/IP (janela de 15min)
 - Templates por tipo de violação + copiar para clipboard
 - Dashboard com estatísticas mínimas (total, por status, por tipo)
 
@@ -42,7 +43,8 @@ Variáveis obrigatórias:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_STORAGE_BUCKET`
 
-> O app falha rapidamente se variáveis obrigatórias estiverem ausentes.
+> O app falha rapidamente se variáveis obrigatórias (exceto `NEXTAUTH_SECRET`) estiverem ausentes.
+> Se `NEXTAUTH_SECRET` estiver ausente no runtime, o middleware retorna erro controlado (`503`) nas rotas protegidas.
 
 ## Banco de dados (local com Docker)
 

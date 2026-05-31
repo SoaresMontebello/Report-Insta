@@ -3,7 +3,9 @@ import { NextResponse } from "next/server";
 import { getAuthSession } from "@/app/lib/auth";
 import { caseInputSchema } from "@/app/lib/case-schema";
 import { getEnv } from "@/app/lib/env";
+import { logError } from "@/app/lib/logger";
 import { prisma } from "@/app/lib/prisma";
+import { withSignedAttachmentUrls } from "@/app/lib/signed-url";
 import { supabaseAdmin } from "@/app/lib/supabase-server";
 
 async function findOwnedCase(caseId: string, userId: string) {
@@ -27,20 +29,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Caso não encontrado." }, { status: 404 });
   }
 
-  const bucket = getEnv("SUPABASE_STORAGE_BUCKET");
-
-  const anexos = await Promise.all(
-    existing.anexos.map(async (anexo) => {
-      const { data, error } = await supabaseAdmin.storage
-        .from(bucket)
-        .createSignedUrl(anexo.caminho, 60 * 10);
-
-      return {
-        ...anexo,
-        signedUrl: error ? null : data.signedUrl,
-      };
-    }),
-  );
+  const anexos = await withSignedAttachmentUrls(existing.anexos);
 
   return NextResponse.json({
     ...existing,
@@ -111,7 +100,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     const { error } = await supabaseAdmin.storage.from(bucket).remove(storagePaths);
 
     if (error) {
-      console.error("Erro ao remover anexos do storage:", error);
+      logError("case_delete_storage_cleanup_failed", error, { caseId: id, storagePaths });
       return NextResponse.json({ error: "Não foi possível remover os anexos." }, { status: 500 });
     }
   }

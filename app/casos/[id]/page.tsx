@@ -7,10 +7,9 @@ import { DeleteCaseButton } from "@/app/components/delete-case-button";
 import { UploadForm } from "@/app/components/upload-form";
 import { Card } from "@/components/ui/card";
 import { getAuthSession } from "@/app/lib/auth";
-import { getEnv } from "@/app/lib/env";
 import { formatDate } from "@/app/lib/utils";
 import { prisma } from "@/app/lib/prisma";
-import { supabaseAdmin } from "@/app/lib/supabase-server";
+import { withSignedAttachmentUrls } from "@/app/lib/signed-url";
 import { generateReportTemplate } from "@/app/lib/templates";
 
 export default async function CaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -39,19 +38,7 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ id:
     dataEncontro: formatDate(current.dataEncontro),
   });
 
-  const bucket = getEnv("SUPABASE_STORAGE_BUCKET");
-  const anexos = await Promise.all(
-    current.anexos.map(async (anexo) => {
-      const { data, error } = await supabaseAdmin.storage
-        .from(bucket)
-        .createSignedUrl(anexo.caminho, 60 * 10);
-
-      return {
-        ...anexo,
-        signedUrl: error ? null : data.signedUrl,
-      };
-    }),
-  );
+  const anexos = await withSignedAttachmentUrls(current.anexos);
 
   return (
     <div className="space-y-6">

@@ -5,7 +5,9 @@ import { NextResponse } from "next/server";
 import { allowedMimeTypes, MAX_UPLOAD_SIZE_BYTES } from "@/app/lib/case-schema";
 import { getAuthSession } from "@/app/lib/auth";
 import { getEnv } from "@/app/lib/env";
+import { logError } from "@/app/lib/logger";
 import { prisma } from "@/app/lib/prisma";
+import { createSignedAttachmentUrl } from "@/app/lib/signed-url";
 import { supabaseAdmin } from "@/app/lib/supabase-server";
 
 const mimeToExt: Record<string, string> = {
@@ -61,22 +63,35 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Falha no upload." }, { status: 502 });
   }
 
-  const created = await prisma.anexo.create({
-    data: {
-      casoId: caseId,
-      caminho: path,
-      nome: file.name,
-      mimeType: file.type,
-      tamanho: file.size,
-    },
-  });
+  let created;
 
-  const signed = await supabaseAdmin.storage.from(bucket).createSignedUrl(path, 60 * 10);
+  try {
+    created = await prisma.anexo.create({
+      data: {
+        casoId: caseId,
+        caminho: path,
+        nome: file.name,
+        mimeType: file.type,
+        tamanho: file.size,
+      },
+    });
+  } catch (dbError) {
+    const rollback = await supabaseAdmin.storage.from(bucket).remove([path]);
+
+    if (rollback.error) {
+      logError("upload_rollback_failed", rollback.error, { caseId, path });
+    }
+
+    logError("upload_metadata_create_failed", dbError, { caseId, path });
+    return NextResponse.json({ error: "Falha ao salvar metadados do upload." }, { status: 500 });
+  }
+
+  const signedUrl = await createSignedAttachmentUrl(path);
 
   return NextResponse.json(
     {
       ...created,
-      signedUrl: signed.error ? null : signed.data.signedUrl,
+      signedUrl,
     },
     { status: 201 },
   );
