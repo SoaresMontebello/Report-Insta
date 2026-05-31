@@ -8,6 +8,14 @@ type LoginAttemptWindow = {
 
 const attemptsByKey = new Map<string, LoginAttemptWindow>();
 
+function cleanupExpiredWindows(now: number) {
+  attemptsByKey.forEach((window, key) => {
+    if (now - window.startedAt > WINDOW_MS) {
+      attemptsByKey.delete(key);
+    }
+  });
+}
+
 function getCurrentWindow(now: number, current?: LoginAttemptWindow) {
   if (!current || now - current.startedAt > WINDOW_MS) {
     return { count: 0, startedAt: now };
@@ -23,12 +31,14 @@ export function createLoginRateLimitKey(email: string, ipAddress?: string) {
 }
 
 export function isLoginRateLimited(key: string, now = Date.now()) {
+  cleanupExpiredWindows(now);
   const currentWindow = getCurrentWindow(now, attemptsByKey.get(key));
   attemptsByKey.set(key, currentWindow);
   return currentWindow.count >= MAX_ATTEMPTS;
 }
 
 export function registerLoginFailure(key: string, now = Date.now()) {
+  cleanupExpiredWindows(now);
   const currentWindow = getCurrentWindow(now, attemptsByKey.get(key));
   currentWindow.count += 1;
   attemptsByKey.set(key, currentWindow);

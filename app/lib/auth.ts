@@ -13,16 +13,6 @@ import {
 import { logWarn } from "@/app/lib/logger";
 import { prisma } from "@/app/lib/prisma";
 
-function getClientIp(request: { headers?: Record<string, unknown> } | undefined) {
-  const forwardedFor = request?.headers?.["x-forwarded-for"];
-
-  if (typeof forwardedFor === "string") {
-    return forwardedFor.split(",")[0]?.trim();
-  }
-
-  return undefined;
-}
-
 export const authOptions: NextAuthOptions = {
   secret: getEnv("NEXTAUTH_SECRET"),
   session: {
@@ -38,13 +28,13 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, request) {
+      async authorize(credentials) {
         if (!credentials?.email || !credentials.password) {
           return null;
         }
 
         const normalizedEmail = credentials.email.toLowerCase().trim();
-        const rateLimitKey = createLoginRateLimitKey(normalizedEmail, getClientIp(request));
+        const rateLimitKey = createLoginRateLimitKey(normalizedEmail);
 
         if (isLoginRateLimited(rateLimitKey)) {
           logWarn("login_rate_limited", { email: normalizedEmail });

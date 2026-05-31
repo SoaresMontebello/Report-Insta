@@ -9,9 +9,7 @@ function handleMissingAuthSecret(req: NextRequest) {
     return NextResponse.json({ error: "Configuração de autenticação ausente." }, { status: 503 });
   }
 
-  const loginUrl = new URL("/login", req.url);
-  loginUrl.searchParams.set("error", "auth_config_missing");
-  return NextResponse.redirect(loginUrl);
+  return NextResponse.redirect(new URL("/login", req.url));
 }
 
 export async function middleware(req: NextRequest) {
