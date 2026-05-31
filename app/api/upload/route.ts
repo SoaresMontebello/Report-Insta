@@ -8,6 +8,12 @@ import { getEnv } from "@/app/lib/env";
 import { prisma } from "@/app/lib/prisma";
 import { supabaseAdmin } from "@/app/lib/supabase-server";
 
+const mimeToExt: Record<string, string> = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/webp": "webp",
+};
+
 export async function POST(request: Request) {
   const session = await getAuthSession();
 
@@ -42,7 +48,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Caso não encontrado." }, { status: 404 });
   }
 
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin";
+  const ext = mimeToExt[file.type] ?? "bin";
   const bucket = getEnv("SUPABASE_STORAGE_BUCKET");
   const path = `${session.user.id}/${caseId}/${randomUUID()}.${ext}`;
 
