@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TipoViolacao {
+  NUDEZ_NAO_CONSENSUAL
+  CONTEUDO_MENOR
+  ASSEDIO_AMEACA_CHANTAGEM
+  SUPLANTACAO_IDENTIDADE
+  OUTRO
+}
+
+enum StatusCaso {
+  PENDENTE
+  ENVIADO
+  RESOLVIDO
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  casos        Caso[]
+}
+
+model Caso {
+  id           String       @id @default(cuid())
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  username     String
+  urlPerfil    String
+  urlsPosts    String[]
+  tipoViolacao TipoViolacao
+  gravidade    Int
+  dataEncontro DateTime
+  descricao    String?
+  status       StatusCaso   @default(PENDENTE)
+  dataEnvio    DateTime?
+  observacoes  String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  anexos       Anexo[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([tipoViolacao])
+}
+
+model Anexo {
+  id         String   @id @default(cuid())
+  casoId     String
+  caso       Caso     @relation(fields: [casoId], references: [id], onDelete: Cascade)
+  caminho    String
+  nome       String
+  mimeType   String
+  tamanho    Int
+  createdAt  DateTime @default(now())
+
+  @@index([casoId])
+}
