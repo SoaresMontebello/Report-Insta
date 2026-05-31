@@ -16,6 +16,11 @@ export function getEnv(name: (typeof requiredEnv)[number]) {
   return value;
 }
 
-export function validateRequiredEnv() {
-  requiredEnv.forEach((name) => getEnv(name));
+type ValidateRequiredEnvOptions = {
+  ignore?: Array<(typeof requiredEnv)[number]>;
+};
+
+export function validateRequiredEnv(options: ValidateRequiredEnvOptions = {}) {
+  const ignored = new Set(options.ignore ?? []);
+  requiredEnv.filter((name) => !ignored.has(name)).forEach((name) => getEnv(name));
 }

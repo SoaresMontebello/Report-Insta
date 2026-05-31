@@ -6,7 +6,7 @@ import { validateRequiredEnv } from "@/app/lib/env";
 
 import "./globals.css";
 
-validateRequiredEnv();
+validateRequiredEnv({ ignore: ["NEXTAUTH_SECRET"] });
 
 export const metadata: Metadata = {
   title: "SafeReport v2",
