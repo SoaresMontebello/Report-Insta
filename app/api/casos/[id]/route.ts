@@ -104,6 +104,18 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     return NextResponse.json({ error: "Caso não encontrado." }, { status: 404 });
   }
 
+  const storagePaths = existing.anexos.map((anexo) => anexo.caminho);
+
+  if (storagePaths.length > 0) {
+    const bucket = getEnv("SUPABASE_STORAGE_BUCKET");
+    const { error } = await supabaseAdmin.storage.from(bucket).remove(storagePaths);
+
+    if (error) {
+      console.error("Erro ao remover anexos do storage:", error);
+      return NextResponse.json({ error: "Não foi possível remover os anexos." }, { status: 500 });
+    }
+  }
+
   await prisma.caso.delete({ where: { id } });
 
   return NextResponse.json({ ok: true });
